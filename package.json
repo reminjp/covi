@@ -1,0 +1,65 @@
+{
+  "name": "competitive-visualizer",
+  "version": "0.0.0",
+  "description": "Visualizers for competitive programming.",
+  "license": "MIT",
+  "author": "remin",
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rdrgn/competitive-visualizer.git"
+  },
+  "bin": {
+    "cli": "dist/main.js"
+  },
+  "scripts": {
+    "build": "rm -rf dist build && parcel build src/index.html && tsc --outDir dist src/main.ts",
+    "start": "parcel src/index.html",
+    "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
+    "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore ."
+  },
+  "dependencies": {
+    "carlo": "^0.9.46",
+    "postcss-modules": "^1.4.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "devDependencies": {
+    "@types/carlo": "^0.9.0",
+    "@types/prop-types": "^15.7.1",
+    "@types/react": "^16.8.24",
+    "@types/react-dom": "^16.8.5",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-react": "^7.14.3",
+    "husky": "^3.0.2",
+    "lint-staged": "^9.2.1",
+    "parcel-bundler": "^1.12.3",
+    "prettier": "^1.16.4",
+    "sass": "^1.22.9",
+    "typescript": "^3.5.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js?(x),ts?(x)}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{?(s)css,htm?(l),json,md,y?(a)ml}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
