@@ -13,17 +13,20 @@
     "url": "https://github.com/rdrgn/competitive-visualizer.git"
   },
   "bin": {
-    "cli": "dist/main.js"
+    "cli": "dist/main/index.js"
   },
   "scripts": {
-    "build": "rm -rf dist build && parcel build src/index.html && tsc --outDir dist src/main.ts",
+    "build": "rm -rf dist build && yarn run build:main && yarn run build:renderer",
+    "build:main": "tsc src/main/main.ts --rootDir src/main --outDir dist",
+    "build:renderer": "parcel build src/renderer/index.html --out-dir dist",
     "start": "parcel src/index.html",
-    "carlo": "node dist/main.js",
+    "launch": "node dist/main.js",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
     "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore ."
   },
   "dependencies": {
     "carlo": "^0.9.46",
+    "commander": "^3.0.0",
     "postcss-modules": "^1.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
@@ -31,6 +34,7 @@
   },
   "devDependencies": {
     "@types/carlo": "^0.9.0",
+    "@types/commander": "^2.12.2",
     "@types/prop-types": "^15.7.1",
     "@types/react": "^16.8.24",
     "@types/react-dom": "^16.8.5",
