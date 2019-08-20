@@ -18,6 +18,7 @@
   "scripts": {
     "build": "rm -rf dist build && parcel build src/index.html && tsc --outDir dist src/main.ts",
     "start": "parcel src/index.html",
+    "carlo": "node dist/main.js",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
     "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore ."
   },

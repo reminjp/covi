@@ -1,2 +1,2 @@
-declare const getArgv: () => Promise<string[]>;
-declare const getStdin: () => Promise<string>;
+declare const getArgv: (() => Promise<string[]>) | undefined;
+declare const getStdin: (() => Promise<string>) | undefined;

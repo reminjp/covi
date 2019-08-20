@@ -3,13 +3,19 @@ import * as React from 'react';
 import styles from './App.scss';
 
 interface Props {
-  test?: string;
+  argv: string[];
+  stdin: string;
 }
 
-export const App: React.FC<Props> = ({ test }) => {
-  return <div className={styles.root}>Hello {test}</div>;
+export const App: React.FC<Props> = ({ argv, stdin }) => {
+  return (
+    <div className={styles.root}>
+      {argv.join(',')} {stdin}
+    </div>
+  );
 };
 
 App.propTypes = {
-  test: PropTypes.string,
+  argv: PropTypes.array.isRequired,
+  stdin: PropTypes.string.isRequired,
 };
