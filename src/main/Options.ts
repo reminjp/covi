@@ -1,4 +1,5 @@
 export interface Options {
-  type?: string;
-  tokens?: string[][];
+  type?: 'graph';
+  data?: string[][];
+  directed?: boolean;
 }
