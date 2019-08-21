@@ -1,7 +1,7 @@
 {
   "name": "competitive-visualizer",
   "version": "0.0.0",
-  "description": "Visualizers for competitive programming.",
+  "description": "A command line tool to visualize test cases in competitive programming.",
   "license": "MIT",
   "author": "remin",
   "files": [
@@ -13,14 +13,14 @@
     "url": "https://github.com/rdrgn/competitive-visualizer.git"
   },
   "bin": {
-    "cli": "dist/main/index.js"
+    "covi": "dist/main.js"
   },
   "scripts": {
     "build": "rm -rf dist build && yarn run build:main && yarn run build:renderer",
     "build:main": "tsc src/main/main.ts --rootDir src/main --outDir dist",
     "build:renderer": "parcel build src/renderer/index.html --out-dir dist --no-source-maps",
     "start": "parcel src/index.html",
-    "launch": "node dist/main.js",
+    "cli": "node dist/main.js",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
     "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore ."
   },
