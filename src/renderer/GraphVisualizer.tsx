@@ -43,6 +43,12 @@ export const GraphVisualizer: React.FC<Props> = ({ graph }) => {
       return;
     }
 
+    const multiedge = new Map<string, number>();
+    graph.edges.forEach(e => {
+      const s = `${e[0]} ${e[1]}`;
+      multiedge.set(s, (multiedge.get(s) || 0) + 1);
+    });
+
     const network = new vis.Network(
       container,
       {
@@ -60,6 +66,7 @@ export const GraphVisualizer: React.FC<Props> = ({ graph }) => {
             to: e[1],
             label: e[2],
             arrows: graph.directed && { to: { enabled: true, scaleFactor: 0.5 } },
+            smooth: multiedge.get(`${e[0]} ${e[1]}`) + multiedge.get(`${e[1]} ${e[0]}`) >= 2,
           },
         })),
       },
