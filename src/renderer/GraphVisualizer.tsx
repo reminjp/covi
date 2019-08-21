@@ -32,33 +32,44 @@ interface Props {
 }
 
 export const GraphVisualizer: React.FC<Props> = ({ graph }) => {
-  const onContainerLoaded = React.useCallback(
-    container => {
-      new vis.Network(
-        container,
-        {
-          nodes: graph.nodes.map((e, i) => ({
-            ...defaultVisNode,
-            ...{
-              id: i,
-              label: e,
-            },
-          })),
-          edges: graph.edges.map(e => ({
-            ...defaultVisEdge,
-            ...{
-              from: e[0],
-              to: e[1],
-              label: e[2],
-              arrows: graph.directed && { to: { enabled: true, scaleFactor: 0.5 } },
-            },
-          })),
-        },
-        {}
-      );
-    },
-    [graph]
-  );
+  const [container, setContainer] = React.useState<HTMLElement>();
+
+  const onContainerLoaded = React.useCallback(container => {
+    setContainer(container);
+  }, []);
+
+  React.useEffect(() => {
+    if (!container) {
+      return;
+    }
+
+    const network = new vis.Network(
+      container,
+      {
+        nodes: graph.nodes.map((e, i) => ({
+          ...defaultVisNode,
+          ...{
+            id: i,
+            label: e,
+          },
+        })),
+        edges: graph.edges.map(e => ({
+          ...defaultVisEdge,
+          ...{
+            from: e[0],
+            to: e[1],
+            label: e[2],
+            arrows: graph.directed && { to: { enabled: true, scaleFactor: 0.5 } },
+          },
+        })),
+      },
+      {}
+    );
+
+    return () => {
+      network.destroy();
+    };
+  }, [container]);
 
   return <div className={styles.root} ref={onContainerLoaded} />;
 };
