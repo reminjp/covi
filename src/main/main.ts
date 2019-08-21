@@ -8,10 +8,24 @@ const options: Options = {};
 
 const program = new Command();
 program.version(packageJson.version);
-program.arguments('<type>').action(type => {
-  options.type = type;
-});
+program
+  .command('graph')
+  .option('-d, --directed', 'Make edges directed')
+  .action(command => {
+    options.type = 'graph';
+    options.directed = command.directed ? true : false;
+  });
+// program.arguments('<type>').action((type: string) => {
+//   if (type === 'graph') {
+//     options.type = type;
+//   }
+// });
 program.parse(process.argv);
+
+if (options.type === undefined) {
+  program.outputHelp();
+  process.exit();
+}
 
 let stdin = '';
 let launched = false;
@@ -21,12 +35,15 @@ const launch = () => {
     if (launched) return;
     launched = true;
 
-    options.tokens = stdin.split(/[\r\n]+/).map(line => line.split(/\s+/).filter(token => token !== ''));
+    options.data = stdin
+      .trim()
+      .split(/[\r\n]+/)
+      .map(line => line.split(/\s+/));
 
     const app = await carlo.launch({ width: 512, height: 512, title: packageJson.name });
     app.on('exit', () => process.exit());
     app.serveFolder(__dirname);
-    await app.exposeFunction('getOption', () => options);
+    await app.exposeFunction('getOptions', () => options);
     await app.load('index.html');
   })().catch(reason => {
     console.error(reason);

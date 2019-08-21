@@ -8,6 +8,7 @@ declare const getOptions: (() => Promise<Options>) | undefined;
 
 (async () => {
   const options = getOptions !== undefined ? await getOptions() : {};
+  console.log(options);
   render(<App options={options} />, document.getElementById('root'));
 })().catch(reason => {
   console.error(reason);
