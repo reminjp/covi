@@ -52,23 +52,27 @@ export const GraphVisualizer: React.FC<Props> = ({ graph }) => {
     const network = new vis.Network(
       container,
       {
-        nodes: graph.nodes.map((e, i) => ({
-          ...defaultVisNode,
-          ...{
-            id: i,
-            label: e,
-          },
-        })),
-        edges: graph.edges.map(e => ({
-          ...defaultVisEdge,
-          ...{
-            from: e[0],
-            to: e[1],
-            label: e[2],
-            arrows: graph.directed && { to: { enabled: true, scaleFactor: 0.5 } },
-            smooth: multiedge.get(`${e[0]} ${e[1]}`) + multiedge.get(`${e[1]} ${e[0]}`) >= 2,
-          },
-        })),
+        nodes: graph.nodes.map(
+          (e, i): vis.Node => ({
+            ...defaultVisNode,
+            ...{
+              id: i,
+              label: e,
+            },
+          })
+        ),
+        edges: graph.edges.map(
+          (e): vis.Edge => ({
+            ...defaultVisEdge,
+            ...{
+              from: e[0],
+              to: e[1],
+              label: e[2],
+              arrows: graph.directed ? { to: { enabled: true, scaleFactor: 0.5 } } : undefined,
+              smooth: multiedge.get(`${e[0]} ${e[1]}`) + multiedge.get(`${e[1]} ${e[0]}`) >= 2,
+            },
+          })
+        ),
       },
       {}
     );
