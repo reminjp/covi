@@ -1,6 +1,6 @@
-# competitive-visualizer
+# covi (competitive-visualizer)
 
-<!-- [![License][license-badge]][license-badge-url] -->
+[![License][license-badge]][license-badge-url]
 
 A command line tool to visualize test cases in competitive programming.
 
@@ -8,7 +8,7 @@ A command line tool to visualize test cases in competitive programming.
 
 1. Install [Google Chrome](https://www.google.com/chrome/)
 2. Install `yarn` (or `npm`)
-3. ~~`yarn global add competitive-visualizer`~~ (Not published yet)
+3. `yarn global add covi`
 
 ## Usage
 
@@ -20,7 +20,13 @@ covi --help
 covi graph --directed < input.txt
 ```
 
-Graph input format
+### Graph
+
+#### Input
+
+- `N`: The number of nodes
+- `a_i`, `b_i`: Edge `i` (from `a_i` to `b_i`)
+- `c_i`: Label of edge `i`
 
 ```
 N
@@ -45,7 +51,7 @@ $ yarn run build
 
 ## License
 
-[MIT][license-badge-url]
+[![License][license-badge]][license-badge-url]
 
-[license-badge]: https://img.shields.io/github/license/rdrgn/competitive-visualizer
+[license-badge]: https://img.shields.io/github/license/rdrgn/covi
 [license-badge-url]: ./LICENSE
