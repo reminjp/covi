@@ -6,6 +6,7 @@
   "author": "remin",
   "files": [
     "dist",
+    "main.js",
     "LICENSE"
   ],
   "repository": {
@@ -13,7 +14,7 @@
     "url": "https://github.com/rdrgn/covi.git"
   },
   "bin": {
-    "covi": "dist/main.js"
+    "covi": "./main.js"
   },
   "scripts": {
     "build": "rm -rf dist build && yarn run build:main && yarn run build:renderer",
