@@ -1,5 +1,7 @@
 # covi (competitive-visualizer)
 
+[![Latest NPM release][npm-badge]][npm-badge-url]
+[![Install Size][npm-size-badge]][npm-size-badge-url]
 [![License][license-badge]][license-badge-url]
 
 A command line tool to visualize test cases in competitive programming.
@@ -53,5 +55,9 @@ $ yarn run build
 
 [![License][license-badge]][license-badge-url]
 
+[npm-badge]: https://img.shields.io/npm/v/covi.svg
+[npm-badge-url]: https://www.npmjs.com/package/covi
+[npm-size-badge]: https://packagephobia.now.sh/badge?p=covi
+[npm-size-badge-url]: https://packagephobia.now.sh/result?p=covi
 [license-badge]: https://img.shields.io/github/license/rdrgn/covi
 [license-badge-url]: ./LICENSE
