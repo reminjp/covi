@@ -1,5 +1,5 @@
 {
-  "name": "competitive-visualizer",
+  "name": "covi",
   "version": "0.0.0",
   "description": "A command line tool to visualize test cases in competitive programming.",
   "license": "MIT",
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rdrgn/competitive-visualizer.git"
+    "url": "https://github.com/rdrgn/covi.git"
   },
   "bin": {
     "covi": "dist/main.js"
