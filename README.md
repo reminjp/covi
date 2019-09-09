@@ -10,7 +10,7 @@ A command line tool to visualize test cases in competitive programming.
 
 1. Install [Google Chrome](https://www.google.com/chrome/)
 2. Install `yarn` (or `npm`)
-3. `yarn global add covi`
+3. `yarn global add covi` (or `npm install --global covi`)
 
 ## Usage
 
