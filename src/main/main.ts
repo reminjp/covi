@@ -4,8 +4,27 @@ import { Options } from './Options';
 
 const packageJson: { name: string; version: string } = require('../package.json');
 
-let stdin = '';
-let isStarted = false;
+let stdin: string = '';
+let isStarted: boolean = false;
+
+let command: 'graph';
+let commandOptions: any;
+
+const program = new Command();
+program.version(packageJson.version);
+program
+  .command('graph')
+  .option('-d, --directed', 'Make edges directed')
+  .action(o => {
+    command = 'graph';
+    commandOptions = o;
+  });
+program.parse(process.argv);
+
+if (command === undefined || commandOptions === undefined) {
+  program.outputHelp();
+  process.exit();
+}
 
 const start = () => {
   if (isStarted) return;
@@ -16,16 +35,11 @@ const start = () => {
     .split(/[\r\n]+/)
     .map(line => line.split(/\s+/));
 
-  const options: Options = {};
+  const options: Options = { type: command };
 
-  const program = new Command();
-  program.version(packageJson.version);
-  program
-    .command('graph')
-    .option('-d, --directed', 'Make edges directed')
-    .action(o => {
-      options.type = 'graph';
-      options.graph = { nodes: [], edges: [], directed: !!o.directed };
+  switch (command) {
+    case 'graph': {
+      options.graph = { nodes: [], edges: [], directed: !!commandOptions.directed };
 
       const header = table[0];
       const body = table.slice(1);
@@ -48,12 +62,9 @@ const start = () => {
       while (options.graph.nodes.length < nodeCount) {
         options.graph.nodes.push(undefined);
       }
-    });
-  program.parse(process.argv);
 
-  if (options.type === undefined) {
-    program.outputHelp();
-    process.exit();
+      break;
+    }
   }
 
   (async () => {
