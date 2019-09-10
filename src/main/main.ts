@@ -2,7 +2,7 @@ import * as carlo from 'carlo';
 import { Command } from 'commander';
 import { Options } from './Options';
 
-const packageJson: { name: string; version: string } = require('../package.json');
+const packageJson: { name: string; version: string } = require('../../package.json');
 
 let stdin: string = '';
 let isStarted: boolean = false;
