@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "rm -rf dist build && yarn run build:main && yarn run build:renderer",
-    "build:main": "parcel build src/main/main.ts --target node --out-dir dist --no-source-maps",
+    "build:main": "parcel build src/main/main.ts --target node --bundle-node-modules --out-dir dist --no-source-maps",
     "build:renderer": "parcel build src/renderer/index.html --out-dir dist --no-source-maps",
     "start": "parcel src/renderer/index.html",
     "cli": "node dist/main.js",
