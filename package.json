@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "rm -rf dist build && yarn run build:main && yarn run build:renderer",
-    "build:main": "tsc src/main/main.ts --rootDir src/main --outDir dist",
+    "build:main": "parcel build src/main/main.ts --target node --out-dir dist --no-source-maps",
     "build:renderer": "parcel build src/renderer/index.html --out-dir dist --no-source-maps",
     "start": "parcel src/renderer/index.html",
     "cli": "node dist/main.js",
@@ -26,15 +26,7 @@
     "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore .",
     "prepublish": "yarn run build"
   },
-  "dependencies": {
-    "carlo": "^0.9.46",
-    "commander": "^3.0.1",
-    "postcss-modules": "^1.4.1",
-    "prop-types": "^15.7.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "vis-network": "^5.4.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/carlo": "^0.9.0",
     "@types/commander": "^2.12.2",
@@ -43,6 +35,8 @@
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
+    "carlo": "^0.9.46",
+    "commander": "^3.0.1",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-plugin-import": "^2.18.2",
@@ -51,9 +45,14 @@
     "husky": "^3.0.5",
     "lint-staged": "^9.2.5",
     "parcel-bundler": "^1.12.3",
+    "postcss-modules": "^1.4.1",
     "prettier": "^1.16.4",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "sass": "^1.23.0-module.beta.1",
-    "typescript": "^3.6.2"
+    "typescript": "^3.6.2",
+    "vis-network": "^5.4.1"
   },
   "husky": {
     "hooks": {
