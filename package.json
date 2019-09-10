@@ -1,6 +1,6 @@
 {
   "name": "covi",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A command line tool to visualize test cases in competitive programming.",
   "license": "MIT",
   "author": "remin",
