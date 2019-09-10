@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "rm -rf dist build && yarn run build:main && yarn run build:renderer",
-    "build:main": "parcel build src/main/main.ts --target node --bundle-node-modules --out-dir dist --no-source-maps",
+    "build:main": "parcel build src/main/main.ts --target node --out-dir dist --no-source-maps",
     "build:renderer": "parcel build src/renderer/index.html --out-dir dist --no-source-maps",
     "start": "parcel src/renderer/index.html",
     "cli": "node dist/main.js",
@@ -26,7 +26,10 @@
     "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore .",
     "prepublish": "yarn run build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "carlo": "^0.9.46",
+    "commander": "^3.0.1"
+  },
   "devDependencies": {
     "@types/carlo": "^0.9.0",
     "@types/commander": "^2.12.2",
@@ -35,8 +38,6 @@
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
-    "carlo": "^0.9.46",
-    "commander": "^3.0.1",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-plugin-import": "^2.18.2",
