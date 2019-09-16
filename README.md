@@ -6,11 +6,15 @@
 
 A command line tool to visualize test cases in competitive programming.
 
+競技プログラミングのテストケースを可視化するコマンドラインツール。
+
 ## Installation
 
-1. Install [Google Chrome](https://www.google.com/chrome/)
+1. **Install [Google Chrome](https://www.google.com/chrome/)**
 2. Install `yarn` (or `npm`)
 3. `yarn global add covi` (or `npm install --global covi`)
+
+We use [Carlo](https://github.com/GoogleChromeLabs/carlo) to render the GUI and it depends on Google Chrome.
 
 ## Usage
 
