@@ -36,6 +36,7 @@
     "@types/prop-types": "^15.7.2",
     "@types/react": "^16.8.24",
     "@types/react-dom": "^16.9.0",
+    "@types/react-resize-detector": "^4.0.2",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
     "eslint": "^6.3.0",
@@ -51,9 +52,9 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-resize-detector": "^4.2.0",
     "sass": "^1.23.0-module.beta.1",
-    "typescript": "^3.6.2",
-    "vis-network": "^5.4.1"
+    "typescript": "^3.6.2"
   },
   "husky": {
     "hooks": {

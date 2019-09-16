@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { Options } from '../main/Options';
-import { GraphVisualizer } from './GraphVisualizer';
 import './index.scss';
+import { App } from './App';
 
 declare const getOptions: (() => Promise<Options>) | undefined;
 
@@ -13,9 +13,7 @@ const defaultGraph: Options = {
 
 (async () => {
   const options: Options = typeof getOptions === 'function' ? await getOptions() : defaultGraph;
-  if (options.graph !== undefined) {
-    render(<GraphVisualizer graph={options.graph} />, document.getElementById('root'));
-  }
+  render(<App options={options} />, document.getElementById('root'));
 })().catch(reason => {
   console.error(reason);
 });
