@@ -13,10 +13,11 @@ const arrowSize = 2;
 
 const zoomMin = 0;
 const zoomMax = 20;
-const viewHeightCoefficient = 100;
+const viewHeightCoefficient = 200;
 const viewHeightBase = 1 + 1 / 8;
 const nodeRadius = 10;
-// const edgeLength = 100;
+const edgeLength = 100;
+const edgeSpring = 0.01;
 
 interface Props {
   graph: Graph;
@@ -36,9 +37,56 @@ export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, widt
   const [downTargetX, setDownTargetX] = React.useState(0);
   const [downTargetY, setDownTargetY] = React.useState(0);
 
-  const [nodeStates, setNodeStates] = React.useState<{ x: number; y: number }[]>(
-    [...Array(graph.nodes.length)].map((_, i) => ({ x: 100 * i, y: 0 }))
-  );
+  const initialNodeStates = React.useMemo(() => {
+    const nodes = [...Array(graph.nodes.length)].map(() => ({
+      x: Math.random() * viewHeightCoefficient,
+      y: Math.random() * viewHeightCoefficient,
+    }));
+
+    const matrix = [...Array(nodes.length)].map(() => Array(nodes.length).fill(false));
+    graph.edges.forEach(([from, to]) => {
+      matrix[from][to] = true;
+      matrix[to][from] = true;
+    });
+
+    for (let iteration = 0; iteration < 100; iteration++) {
+      for (let i = 0; i < graph.nodes.length; i++) {
+        for (let j = 0; j < graph.nodes.length; j++) {
+          const dx = nodes[j].x - nodes[i].x;
+          const dy = nodes[j].y - nodes[i].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d <= edgeLength) {
+            nodes[i].x -= dx * edgeSpring;
+            nodes[i].y -= dy * edgeSpring;
+            nodes[j].x += dx * edgeSpring;
+            nodes[j].y += dy * edgeSpring;
+          } else if (matrix[i][j]) {
+            nodes[i].x += dx * edgeSpring;
+            nodes[i].y += dy * edgeSpring;
+            nodes[j].x -= dx * edgeSpring;
+            nodes[j].y -= dy * edgeSpring;
+          }
+        }
+      }
+    }
+
+    let xMin = Number.MAX_VALUE;
+    let xMax = Number.MIN_VALUE;
+    let yMin = Number.MAX_VALUE;
+    let yMax = Number.MIN_VALUE;
+    nodes.forEach(({ x, y }) => {
+      if (x < xMin) xMin = x;
+      if (x > xMax) xMax = x;
+      if (y < yMin) yMin = y;
+      if (y > yMax) yMax = y;
+    });
+    setViewX(xMin + (xMax - xMin) / 2);
+    setViewY(yMin + (yMax - yMin) / 2);
+
+    return nodes;
+  }, [graph]);
+
+  const [nodeStates, setNodeStates] = React.useState<{ x: number; y: number }[]>(initialNodeStates);
 
   const onPointerMove = React.useCallback(
     (event: React.PointerEvent<SVGSVGElement>) => {
