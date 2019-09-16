@@ -24,7 +24,7 @@
     "cli": "node dist/main.js",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
     "fix": "eslint --fix --ext .ts,.tsx --ignore-path .gitignore .",
-    "prepublish": "yarn run build"
+    "prepublishOnly": "yarn run build"
   },
   "dependencies": {
     "carlo": "^0.9.46",
