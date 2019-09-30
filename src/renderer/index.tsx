@@ -16,7 +16,7 @@ for (let i = 0; i < n; i++) {
 }
 for (let i = 0; i < n; i++) {
   for (let j = 0; j < n; j++) {
-    if (Math.random() < 2 / 10) {
+    if (Math.random() < 1 / n) {
       defaultGraph.graph.edges.push([i, j, String(Math.floor(Math.random() * 1e9))]);
     }
   }
