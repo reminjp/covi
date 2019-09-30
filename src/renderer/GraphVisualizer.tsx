@@ -4,20 +4,27 @@ import { Graph } from '../main/Options';
 import styles from './GraphVisualizer.scss';
 import { VisualizerProps } from './VisualizerProps';
 
-const color = 'black';
-const colorHovered = 'red';
-const backgroundColor = 'white';
+const COLOR = 'black';
+const COLOR_HOVERED = 'red';
+const BACKGROUND_COLOR = 'white';
 
-const strokeWidth = 1;
-const arrowSize = 2;
+const NODE_FONT_SIZE = 12;
+const EDGE_FONT_SIZE = 8;
 
-const zoomMin = 0;
-const zoomMax = 20;
-const viewHeightCoefficient = 200;
-const viewHeightBase = 1 + 1 / 8;
-const nodeRadius = 10;
-const edgeLength = 100;
-const edgeSpring = 0.01;
+const STROKE_WIDTH = 1;
+const ARROW_SIZE = 5;
+
+const ZOOM_MIN = 0;
+const ZOOM_MAX = 20;
+const VIEW_HEIGHT_COEFFICIENT = 200;
+const VIEW_HEIGHT_BASE = 1 + 1 / 8;
+const NODE_RADIUS = 10;
+const EDGE_LENGTH = 80;
+const EDGE_SPRING = 0.1;
+const ATTRACTION_RATIO = 0.01;
+const PHYSICS_DURATION = 2000;
+const PHYSICS_ITERATION = 2;
+const PHYSICS_FPS = 60;
 
 interface Props {
   graph: Graph;
@@ -27,110 +34,135 @@ export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, widt
   const [viewX, setViewX] = React.useState(0);
   const [viewY, setViewY] = React.useState(0);
   const [zoom, setZoom] = React.useState(0);
-  const viewHeight = React.useMemo(() => viewHeightCoefficient * Math.pow(viewHeightBase, zoom), [width, height, zoom]);
+  const viewHeight = React.useMemo(() => VIEW_HEIGHT_COEFFICIENT * Math.pow(VIEW_HEIGHT_BASE, zoom), [
+    width,
+    height,
+    zoom,
+  ]);
   const viewWidth = React.useMemo(() => viewHeight * (width / height), [width, height, viewHeight]);
 
+  const [pointerX, setPointerX] = React.useState(0);
+  const [pointerY, setPointerY] = React.useState(0);
   const [isDown, setIsDown] = React.useState(false);
-  const [downX, setDownX] = React.useState(0);
-  const [downY, setDownY] = React.useState(0);
   const [downTarget, setDownTarget] = React.useState(-1);
-  const [downTargetX, setDownTargetX] = React.useState(0);
-  const [downTargetY, setDownTargetY] = React.useState(0);
 
-  const initialNodeStates = React.useMemo(() => {
-    const nodes = [...Array(graph.nodes.length)].map(() => ({
-      x: Math.random() * viewHeightCoefficient,
-      y: Math.random() * viewHeightCoefficient,
-    }));
-
-    const matrix = [...Array(nodes.length)].map(() => Array(nodes.length).fill(false));
+  const adjacencyMatrix = React.useMemo(() => {
+    const m = [...Array(graph.nodes.length)].map(() => Array(graph.nodes.length).fill(false));
     graph.edges.forEach(([from, to]) => {
-      matrix[from][to] = true;
-      matrix[to][from] = true;
+      m[from][to] = true;
+      if (!graph.directed) m[to][from] = true;
     });
+    return m;
+  }, [graph]);
 
-    for (let iteration = 0; iteration < 100; iteration++) {
-      for (let i = 0; i < graph.nodes.length; i++) {
-        for (let j = 0; j < graph.nodes.length; j++) {
-          const dx = nodes[j].x - nodes[i].x;
-          const dy = nodes[j].y - nodes[i].y;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          if (d <= edgeLength) {
-            nodes[i].x -= dx * edgeSpring;
-            nodes[i].y -= dy * edgeSpring;
-            nodes[j].x += dx * edgeSpring;
-            nodes[j].y += dy * edgeSpring;
-          } else if (matrix[i][j]) {
-            nodes[i].x += dx * edgeSpring;
-            nodes[i].y += dy * edgeSpring;
-            nodes[j].x -= dx * edgeSpring;
-            nodes[j].y -= dy * edgeSpring;
+  const [nodeStates, setNodeStates] = React.useState<{ x: number; y: number }[]>(
+    [...Array(graph.nodes.length)].map(() => ({
+      x: Math.random() * VIEW_HEIGHT_COEFFICIENT,
+      y: Math.random() * VIEW_HEIGHT_COEFFICIENT,
+    }))
+  );
+  const [modifiedAt, setModifiedAt] = React.useState(new Date());
+  React.useEffect(() => {
+    if (new Date().getTime() > modifiedAt.getTime() + PHYSICS_DURATION) return;
+
+    const intervalId = setInterval(() => {
+      for (let iteration = 0; iteration < PHYSICS_ITERATION; iteration++) {
+        for (let i = 0; i < graph.nodes.length; i++) {
+          if (isDown && i === downTarget) continue;
+          nodeStates[i].x *= 1 - ATTRACTION_RATIO;
+          nodeStates[i].y *= 1 - ATTRACTION_RATIO;
+        }
+        for (let i = 0; i < graph.nodes.length; i++) {
+          for (let j = 0; j < graph.nodes.length; j++) {
+            if (i === j) continue;
+            const lx = nodeStates[j].x - nodeStates[i].x;
+            const ly = nodeStates[j].y - nodeStates[i].y;
+            const l = Math.sqrt(lx * lx + ly * ly);
+            if (l <= EDGE_LENGTH || adjacencyMatrix[i][j]) {
+              const dx = (lx - (lx / l) * EDGE_LENGTH) * EDGE_SPRING;
+              const dy = (ly - (ly / l) * EDGE_LENGTH) * EDGE_SPRING;
+              if (isDown && i === downTarget) {
+                nodeStates[j].x -= dx;
+                nodeStates[j].y -= dy;
+              } else if (isDown && j === downTarget) {
+                nodeStates[i].x += dx;
+                nodeStates[i].y += dy;
+              } else {
+                nodeStates[i].x += dx / 2;
+                nodeStates[i].y += dy / 2;
+                nodeStates[j].x -= dx / 2;
+                nodeStates[j].y -= dy / 2;
+              }
+            }
           }
         }
       }
-    }
+      setNodeStates(nodeStates);
+    }, 1000 / PHYSICS_FPS);
 
-    let xMin = Number.MAX_VALUE;
-    let xMax = Number.MIN_VALUE;
-    let yMin = Number.MAX_VALUE;
-    let yMax = Number.MIN_VALUE;
-    nodes.forEach(({ x, y }) => {
-      if (x < xMin) xMin = x;
-      if (x > xMax) xMax = x;
-      if (y < yMin) yMin = y;
-      if (y > yMax) yMax = y;
-    });
-    setViewX(xMin + (xMax - xMin) / 2);
-    setViewY(yMin + (yMax - yMin) / 2);
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+    }, PHYSICS_DURATION);
 
-    return nodes;
-  }, [graph]);
-
-  const [nodeStates, setNodeStates] = React.useState<{ x: number; y: number }[]>(initialNodeStates);
+    return () => {
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+    };
+  }, [isDown, downTarget, nodeStates, modifiedAt, adjacencyMatrix]);
 
   const onPointerMove = React.useCallback(
     (event: React.PointerEvent<SVGSVGElement>) => {
-      const x = viewX - viewWidth / 2 + event.clientX * (viewHeight / height);
-      const y = viewY - viewHeight / 2 + event.clientY * (viewHeight / height);
+      let x = viewX - viewWidth / 2 + event.clientX * (viewHeight / height);
+      let y = viewY - viewHeight / 2 + event.clientY * (viewHeight / height);
 
       if (isDown) {
         if (downTarget < 0) {
-          setViewX(downTargetX - (x - downX));
-          setViewY(downTargetY - (y - downY));
+          setViewX(viewX - (x - pointerX));
+          setViewY(viewY - (y - pointerY));
+          x = pointerX;
+          y = pointerY;
         } else {
-          const a = nodeStates.concat();
-          a[downTarget] = { x: downTargetX + (x - downX), y: downTargetY + (y - downY) };
-          setNodeStates(a);
+          nodeStates[downTarget] = {
+            x: nodeStates[downTarget].x + (x - pointerX),
+            y: nodeStates[downTarget].y + (y - pointerY),
+          };
+          setNodeStates(nodeStates);
+          setModifiedAt(new Date());
         }
       } else {
         const i = nodeStates.findIndex(e => {
           const dx = x - e.x;
           const dy = y - e.y;
-          return dx * dx + dy * dy <= nodeRadius * nodeRadius;
+          return dx * dx + dy * dy <= NODE_RADIUS * NODE_RADIUS;
         });
         setDownTarget(i);
       }
+
+      setPointerX(x);
+      setPointerY(y);
     },
-    [height, viewWidth, viewHeight, isDown, downX, downY, downTarget, downTargetX, downTargetY, nodeStates]
+    [
+      height,
+      setViewX,
+      setViewY,
+      viewWidth,
+      viewHeight,
+      pointerX,
+      setPointerX,
+      pointerY,
+      setPointerY,
+      isDown,
+      downTarget,
+      setDownTarget,
+      nodeStates,
+      setNodeStates,
+      setModifiedAt,
+    ]
   );
 
-  const onPointerDown = React.useCallback(
-    (event: React.PointerEvent<SVGSVGElement>) => {
-      const x = viewX - viewWidth / 2 + event.clientX * (viewHeight / height);
-      const y = viewY - viewHeight / 2 + event.clientY * (viewHeight / height);
-      setIsDown(true);
-      setDownX(x);
-      setDownY(y);
-      if (downTarget < 0) {
-        setDownTargetX(viewX);
-        setDownTargetY(viewY);
-      } else {
-        setDownTargetX(nodeStates[downTarget].x);
-        setDownTargetY(nodeStates[downTarget].y);
-      }
-    },
-    [height, viewX, viewY, viewWidth, viewHeight, downTarget, nodeStates]
-  );
+  const onPointerDown = React.useCallback(() => {
+    setIsDown(true);
+  }, [setIsDown]);
 
   const onPointerUp = React.useCallback(() => {
     setIsDown(false);
@@ -138,9 +170,9 @@ export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, widt
 
   const onWheel = React.useCallback(
     (event: React.WheelEvent<SVGSVGElement>) => {
-      setZoom(Math.max(zoomMin, Math.min(zoomMax, zoom + event.deltaY)));
+      setZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom + event.deltaY)));
     },
-    [zoom]
+    [zoom, setZoom]
   );
 
   // const multiedge = new Map<string, number[]>();
@@ -163,7 +195,7 @@ export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, widt
       onPointerLeave={onPointerUp}
       onWheel={onWheel}
     >
-      <g stroke={color} strokeWidth={strokeWidth}>
+      <g stroke={COLOR} strokeWidth={STROKE_WIDTH}>
         {graph.edges.map(([from, to], index) => (
           <line
             key={index}
@@ -171,68 +203,70 @@ export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, widt
             y1={nodeStates[from].y}
             x2={nodeStates[to].x}
             y2={nodeStates[to].y}
-            stroke={isEdgesHovered[index] ? colorHovered : undefined}
+            stroke={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
           />
         ))}
       </g>
       {graph.directed && (
-        <g stroke={color} strokeWidth={strokeWidth} fill={color}>
+        <g stroke={COLOR} strokeWidth={STROKE_WIDTH} fill={COLOR}>
           {graph.edges.map(([from, to], index) => {
             const dx = nodeStates[to].x - nodeStates[from].x;
             const dy = nodeStates[to].y - nodeStates[from].y;
             const length = Math.sqrt(dx * dx + dy * dy);
             const ux = dx / length;
             const uy = dy / length;
-            const ox = nodeStates[to].x - (nodeRadius + strokeWidth / 2) * ux;
-            const oy = nodeStates[to].y - (nodeRadius + strokeWidth / 2) * uy;
+            const ox = nodeStates[to].x - (NODE_RADIUS + STROKE_WIDTH / 2) * ux;
+            const oy = nodeStates[to].y - (NODE_RADIUS + STROKE_WIDTH / 2) * uy;
             return (
               <polygon
                 key={index}
-                points={`${ox},${oy} ${ox - arrowSize * ux - (arrowSize / 2) * uy},${oy -
-                  arrowSize * uy +
-                  (arrowSize / 2) * ux} ${ox - arrowSize * ux + (arrowSize / 2) * uy},${oy -
-                  arrowSize * uy -
-                  (arrowSize / 2) * ux}`}
-                stroke={isEdgesHovered[index] ? colorHovered : undefined}
-                fill={isEdgesHovered[index] ? colorHovered : undefined}
+                points={`${ox},${oy} ${ox - ARROW_SIZE * ux - (ARROW_SIZE / 2) * uy},${oy -
+                  ARROW_SIZE * uy +
+                  (ARROW_SIZE / 2) * ux} ${ox - ARROW_SIZE * ux + (ARROW_SIZE / 2) * uy},${oy -
+                  ARROW_SIZE * uy -
+                  (ARROW_SIZE / 2) * ux}`}
+                stroke={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
+                fill={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
               />
             );
           })}
         </g>
       )}
-      <g fill={color}>
+      <g fill={COLOR}>
         {graph.edges.map(([from, to, label], index) => (
           <text
             key={index}
             x={(nodeStates[from].x + nodeStates[to].x) / 2}
             y={(nodeStates[from].y + nodeStates[to].y) / 2}
+            fontSize={EDGE_FONT_SIZE}
             textAnchor="middle"
             dominantBaseline="central"
             pointerEvents="none"
-            fill={isEdgesHovered[index] ? colorHovered : undefined}
+            fill={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
           >
             {label}
           </text>
         ))}
       </g>
-      <g stroke={color} strokeWidth={strokeWidth} fill={backgroundColor}>
+      <g stroke={COLOR} strokeWidth={STROKE_WIDTH} fill={BACKGROUND_COLOR}>
         {graph.nodes.map((label, index) => (
           <circle
             key={index}
             cx={nodeStates[index].x}
             cy={nodeStates[index].y}
-            r={nodeRadius}
-            stroke={index === downTarget ? colorHovered : undefined}
+            r={NODE_RADIUS}
+            stroke={index === downTarget ? COLOR_HOVERED : undefined}
           />
         ))}
       </g>
-      <g fill={color}>
+      <g fill={COLOR}>
         {graph.nodes.map((label, index) => (
           <text
             key={index}
             x={nodeStates[index].x}
             y={nodeStates[index].y}
-            fill={downTarget === index ? colorHovered : undefined}
+            fill={downTarget === index ? COLOR_HOVERED : undefined}
+            fontSize={NODE_FONT_SIZE}
             textAnchor="middle"
             dominantBaseline="central"
             pointerEvents="none"
