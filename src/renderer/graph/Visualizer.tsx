@@ -1,36 +1,29 @@
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import { Graph } from '../main/Options';
-import styles from './GraphVisualizer.scss';
-import { VisualizerProps } from './VisualizerProps';
-
-const COLOR = 'black';
-const COLOR_HOVERED = 'red';
-const BACKGROUND_COLOR = 'white';
-
-const NODE_FONT_SIZE = 12;
-const EDGE_FONT_SIZE = 8;
-
-const STROKE_WIDTH = 1;
-const ARROW_SIZE = 5;
-
-const ZOOM_MIN = 0;
-const ZOOM_MAX = 20;
-const VIEW_HEIGHT_COEFFICIENT = 200;
-const VIEW_HEIGHT_BASE = 1 + 1 / 8;
-const NODE_RADIUS = 10;
-const EDGE_LENGTH = 80;
-const EDGE_SPRING = 0.1;
-const ATTRACTION_RATIO = 0.01;
-const PHYSICS_DURATION = 2000;
-const PHYSICS_ITERATION = 2;
-const PHYSICS_FPS = 60;
+import { Graph } from '../../main/Options';
+import { VisualizerProps } from '../VisualizerProps';
+import { Edge } from './Edge';
+import { Node } from './Node';
+import {
+  ATTRACTION_RATIO,
+  EDGE_LENGTH,
+  EDGE_SPRING,
+  NODE_RADIUS,
+  PHYSICS_DURATION,
+  PHYSICS_FPS,
+  PHYSICS_ITERATION,
+  VIEW_HEIGHT_BASE,
+  VIEW_HEIGHT_COEFFICIENT,
+  ZOOM_MAX,
+  ZOOM_MIN,
+} from './constants';
+import styles from './Visualizer.scss';
 
 interface Props {
   graph: Graph;
 }
 
-export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, width, height }) => {
+export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, height }) => {
   const [viewX, setViewX] = React.useState(0);
   const [viewY, setViewY] = React.useState(0);
   const [zoom, setZoom] = React.useState(0);
@@ -195,91 +188,35 @@ export const GraphVisualizer: React.FC<Props & VisualizerProps> = ({ graph, widt
       onPointerLeave={onPointerUp}
       onWheel={onWheel}
     >
-      <g stroke={COLOR} strokeWidth={STROKE_WIDTH}>
-        {graph.edges.map(([from, to], index) => (
-          <line
+      <g>
+        {graph.edges.map(([from, to, label], index) => (
+          <Edge
             key={index}
             x1={nodeStates[from].x}
             y1={nodeStates[from].y}
             x2={nodeStates[to].x}
             y2={nodeStates[to].y}
-            stroke={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
+            label={label}
+            hovered={isEdgesHovered[index]}
           />
         ))}
       </g>
-      {graph.directed && (
-        <g stroke={COLOR} strokeWidth={STROKE_WIDTH} fill={COLOR}>
-          {graph.edges.map(([from, to], index) => {
-            const dx = nodeStates[to].x - nodeStates[from].x;
-            const dy = nodeStates[to].y - nodeStates[from].y;
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const ux = dx / length;
-            const uy = dy / length;
-            const ox = nodeStates[to].x - (NODE_RADIUS + STROKE_WIDTH / 2) * ux;
-            const oy = nodeStates[to].y - (NODE_RADIUS + STROKE_WIDTH / 2) * uy;
-            return (
-              <polygon
-                key={index}
-                points={`${ox},${oy} ${ox - ARROW_SIZE * ux - (ARROW_SIZE / 2) * uy},${oy -
-                  ARROW_SIZE * uy +
-                  (ARROW_SIZE / 2) * ux} ${ox - ARROW_SIZE * ux + (ARROW_SIZE / 2) * uy},${oy -
-                  ARROW_SIZE * uy -
-                  (ARROW_SIZE / 2) * ux}`}
-                stroke={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
-                fill={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
-              />
-            );
-          })}
-        </g>
-      )}
-      <g fill={COLOR}>
-        {graph.edges.map(([from, to, label], index) => (
-          <text
-            key={index}
-            x={(nodeStates[from].x + nodeStates[to].x) / 2}
-            y={(nodeStates[from].y + nodeStates[to].y) / 2}
-            fontSize={EDGE_FONT_SIZE}
-            textAnchor="middle"
-            dominantBaseline="central"
-            pointerEvents="none"
-            fill={isEdgesHovered[index] ? COLOR_HOVERED : undefined}
-          >
-            {label}
-          </text>
-        ))}
-      </g>
-      <g stroke={COLOR} strokeWidth={STROKE_WIDTH} fill={BACKGROUND_COLOR}>
+      <g>
         {graph.nodes.map((label, index) => (
-          <circle
-            key={index}
-            cx={nodeStates[index].x}
-            cy={nodeStates[index].y}
-            r={NODE_RADIUS}
-            stroke={index === downTarget ? COLOR_HOVERED : undefined}
-          />
-        ))}
-      </g>
-      <g fill={COLOR}>
-        {graph.nodes.map((label, index) => (
-          <text
+          <Node
             key={index}
             x={nodeStates[index].x}
             y={nodeStates[index].y}
-            fill={downTarget === index ? COLOR_HOVERED : undefined}
-            fontSize={NODE_FONT_SIZE}
-            textAnchor="middle"
-            dominantBaseline="central"
-            pointerEvents="none"
-          >
-            {label}
-          </text>
+            label={label}
+            hovered={index === downTarget}
+          />
         ))}
       </g>
     </svg>
   );
 };
 
-GraphVisualizer.propTypes = {
+Visualizer.propTypes = {
   graph: PropTypes.any.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
