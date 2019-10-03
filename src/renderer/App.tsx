@@ -2,7 +2,7 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import ReactResizeDetector from 'react-resize-detector';
 import { Options } from '../main/Options';
-import { GraphVisualizer } from './GraphVisualizer';
+import { GraphVisualizer } from './graph';
 
 interface Props {
   options: Options;
