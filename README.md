@@ -8,6 +8,8 @@ A command line tool to visualize test cases in competitive programming.
 
 競技プログラミングのテストケースを可視化するコマンドラインツール。
 
+![covi](image.png)
+
 ## Installation
 
 1. **Install [Google Chrome](https://www.google.com/chrome/)**
