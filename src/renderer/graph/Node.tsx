@@ -24,8 +24,11 @@ export const Node: React.FC<Props> = ({ x, y, label, hovered }) => {
         <text
           x={x}
           y={y}
+          stroke={BACKGROUND_COLOR}
+          strokeWidth={STROKE_WIDTH}
           fill={hovered ? COLOR_HOVERED : COLOR}
           fontSize={NODE_FONT_SIZE}
+          paintOrder="stroke"
           textAnchor="middle"
           dominantBaseline="central"
           pointerEvents="none"
