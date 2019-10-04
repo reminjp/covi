@@ -168,11 +168,18 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
     [zoom, setZoom]
   );
 
-  // const multiedge = new Map<string, number[]>();
-  // graph.edges.forEach((e, i) => {
-  //   const s = `${e[0]} ${e[1]}`;
-  //   multiedge.set(s, (multiedge.get(s) || 0) + 1);
-  // });
+  const multiEdgeCount = new Map<number, number>();
+  const multiEdgeFraction: [number, number][] = [];
+  graph.edges.forEach(([from, to], i) => {
+    const key = graph.edges.length * Math.min(from, to) + Math.max(from, to);
+    if (!multiEdgeCount.has(key)) multiEdgeCount.set(key, 0);
+    const c = multiEdgeCount.get(key);
+    multiEdgeCount.set(key, c + 1);
+    multiEdgeFraction[i] = [c, undefined];
+  });
+  graph.edges.forEach(([from, to], i) => {
+    multiEdgeFraction[i][1] = multiEdgeCount.get(graph.edges.length * Math.min(from, to) + Math.max(from, to));
+  });
 
   const isEdgesHovered = graph.edges.map(([from, to]) => from === downTarget || (!graph.directed && to === downTarget));
 
@@ -196,11 +203,14 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
             y1={nodeStates[from].y}
             x2={nodeStates[to].x}
             y2={nodeStates[to].y}
+            directed={graph.directed}
+            variant={(to < from ? -1 : 1) * (-(multiEdgeFraction[index][1] - 1) / 2 + multiEdgeFraction[index][0])}
             label={label}
             hovered={isEdgesHovered[index]}
           />
         ))}
       </g>
+
       <g>
         {graph.nodes.map((label, index) => (
           <Node
