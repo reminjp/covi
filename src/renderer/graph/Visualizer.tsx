@@ -17,7 +17,6 @@ import {
   ZOOM_MAX,
   ZOOM_MIN,
 } from './constants';
-import styles from './Visualizer.scss';
 
 interface Props {
   graph: Graph;
@@ -185,7 +184,6 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
 
   return (
     <svg
-      className={styles.root}
       width={width}
       height={height}
       viewBox={`${viewX - viewWidth / 2} ${viewY - viewHeight / 2} ${viewWidth} ${viewHeight}`}
