@@ -1,0 +1,15 @@
+@import '../variables';
+
+.root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding-top: $gap / 4;
+  padding-left: $gap / 4;
+  user-select: none;
+
+  *:not(:first-child) {
+    margin-left: $gap / 4;
+  }
+}
