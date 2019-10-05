@@ -177,7 +177,8 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
 
   const onWheel = React.useCallback(
     (event: React.WheelEvent<SVGSVGElement>) => {
-      setZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom + event.deltaY)));
+      if (event.deltaY === 0) return;
+      setZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom + (event.deltaY < 0 ? -1 : 1))));
     },
     [zoom, setZoom]
   );
