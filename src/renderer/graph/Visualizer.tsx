@@ -1,6 +1,7 @@
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { Graph } from '../../main/Options';
+import { Navbar, Button } from '../ui';
 import { VisualizerProps } from '../VisualizerProps';
 import { Edge } from './Edge';
 import { Node } from './Node';
@@ -23,6 +24,18 @@ interface Props {
 }
 
 export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, height }) => {
+  const svgRef = React.useRef<SVGSVGElement>();
+  const handleCopySvg = React.useCallback(() => {
+    if (!svgRef.current) {
+      return;
+    }
+    if (!navigator.clipboard) {
+      console.error('navigator.clipboard is undefined.');
+      return;
+    }
+    navigator.clipboard.writeText(svgRef.current.outerHTML);
+  }, [svgRef]);
+
   const [viewX, setViewX] = React.useState(0);
   const [viewY, setViewY] = React.useState(0);
   const [zoom, setZoom] = React.useState(0);
@@ -183,44 +196,50 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
   const isEdgesHovered = graph.edges.map(([from, to]) => from === downTarget || (!graph.directed && to === downTarget));
 
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`${viewX - viewWidth / 2} ${viewY - viewHeight / 2} ${viewWidth} ${viewHeight}`}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerLeave={onPointerUp}
-      onWheel={onWheel}
-    >
-      <g>
-        {graph.edges.map(([from, to, label], index) => (
-          <Edge
-            key={index}
-            x1={nodeStates[from].x}
-            y1={nodeStates[from].y}
-            x2={nodeStates[to].x}
-            y2={nodeStates[to].y}
-            directed={graph.directed}
-            variant={(to < from ? -1 : 1) * (-(multiEdgeFraction[index][1] - 1) / 2 + multiEdgeFraction[index][0])}
-            label={label}
-            hovered={isEdgesHovered[index]}
-          />
-        ))}
-      </g>
+    <>
+      <Navbar>
+        <Button onClick={handleCopySvg}>Copy SVG</Button>
+      </Navbar>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={height}
+        viewBox={`${viewX - viewWidth / 2} ${viewY - viewHeight / 2} ${viewWidth} ${viewHeight}`}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
+        onWheel={onWheel}
+      >
+        <g>
+          {graph.edges.map(([from, to, label], index) => (
+            <Edge
+              key={index}
+              x1={nodeStates[from].x}
+              y1={nodeStates[from].y}
+              x2={nodeStates[to].x}
+              y2={nodeStates[to].y}
+              directed={graph.directed}
+              variant={(to < from ? -1 : 1) * (-(multiEdgeFraction[index][1] - 1) / 2 + multiEdgeFraction[index][0])}
+              label={label}
+              hovered={isEdgesHovered[index]}
+            />
+          ))}
+        </g>
 
-      <g>
-        {graph.nodes.map((label, index) => (
-          <Node
-            key={index}
-            x={nodeStates[index].x}
-            y={nodeStates[index].y}
-            label={label}
-            hovered={index === downTarget}
-          />
-        ))}
-      </g>
-    </svg>
+        <g>
+          {graph.nodes.map((label, index) => (
+            <Node
+              key={index}
+              x={nodeStates[index].x}
+              y={nodeStates[index].y}
+              label={label}
+              hovered={index === downTarget}
+            />
+          ))}
+        </g>
+      </svg>
+    </>
   );
 };
 
