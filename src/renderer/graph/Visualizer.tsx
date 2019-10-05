@@ -2,28 +2,18 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { Graph } from '../../main/Options';
 import { Navbar, Button } from '../ui';
+import { Context } from '../Context';
 import { VisualizerProps } from '../VisualizerProps';
 import { Edge } from './Edge';
 import { Node } from './Node';
-import {
-  ATTRACTION_RATIO,
-  EDGE_LENGTH,
-  EDGE_SPRING,
-  NODE_RADIUS,
-  PHYSICS_DURATION,
-  PHYSICS_FPS,
-  PHYSICS_ITERATION,
-  VIEW_HEIGHT_BASE,
-  VIEW_HEIGHT_COEFFICIENT,
-  ZOOM_MAX,
-  ZOOM_MIN,
-} from './constants';
 
 interface Props {
   graph: Graph;
 }
 
 export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, height }) => {
+  const context = React.useContext(Context);
+
   const svgRef = React.useRef<SVGSVGElement>();
   const handleCopySvg = React.useCallback(() => {
     if (!svgRef.current) {
@@ -39,11 +29,10 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
   const [viewX, setViewX] = React.useState(0);
   const [viewY, setViewY] = React.useState(0);
   const [zoom, setZoom] = React.useState(0);
-  const viewHeight = React.useMemo(() => VIEW_HEIGHT_COEFFICIENT * Math.pow(VIEW_HEIGHT_BASE, zoom), [
-    width,
-    height,
-    zoom,
-  ]);
+  const viewHeight = React.useMemo(
+    () => context.graphViewHeightCoefficient * Math.pow(context.graphViewHeightBase, zoom),
+    [width, height, zoom]
+  );
   const viewWidth = React.useMemo(() => viewHeight * (width / height), [width, height, viewHeight]);
 
   const [pointerX, setPointerX] = React.useState(0);
@@ -62,20 +51,20 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
 
   const [nodeStates, setNodeStates] = React.useState<{ x: number; y: number }[]>(
     [...Array(graph.nodes.length)].map(() => ({
-      x: Math.random() * VIEW_HEIGHT_COEFFICIENT,
-      y: Math.random() * VIEW_HEIGHT_COEFFICIENT,
+      x: Math.random() * context.graphViewHeightCoefficient,
+      y: Math.random() * context.graphViewHeightCoefficient,
     }))
   );
   const [modifiedAt, setModifiedAt] = React.useState(new Date());
   React.useEffect(() => {
-    if (new Date().getTime() > modifiedAt.getTime() + PHYSICS_DURATION) return;
+    if (new Date().getTime() > modifiedAt.getTime() + context.graphPhysicsDuration) return;
 
     const intervalId = setInterval(() => {
-      for (let iteration = 0; iteration < PHYSICS_ITERATION; iteration++) {
+      for (let iteration = 0; iteration < context.graphPhysicsIteration; iteration++) {
         for (let i = 0; i < graph.nodes.length; i++) {
           if (isDown && i === downTarget) continue;
-          nodeStates[i].x *= 1 - ATTRACTION_RATIO;
-          nodeStates[i].y *= 1 - ATTRACTION_RATIO;
+          nodeStates[i].x *= 1 - context.graphAttractionRatio;
+          nodeStates[i].y *= 1 - context.graphAttractionRatio;
         }
         for (let i = 0; i < graph.nodes.length; i++) {
           for (let j = 0; j < graph.nodes.length; j++) {
@@ -83,9 +72,9 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
             const lx = nodeStates[j].x - nodeStates[i].x;
             const ly = nodeStates[j].y - nodeStates[i].y;
             const l = Math.sqrt(lx * lx + ly * ly);
-            if (l <= EDGE_LENGTH || adjacencyMatrix[i][j]) {
-              const dx = (lx - (lx / l) * EDGE_LENGTH) * EDGE_SPRING;
-              const dy = (ly - (ly / l) * EDGE_LENGTH) * EDGE_SPRING;
+            if (l <= context.graphEdgeLength || adjacencyMatrix[i][j]) {
+              const dx = (lx - (lx / l) * context.graphEdgeLength) * context.graphEdgeSpring;
+              const dy = (ly - (ly / l) * context.graphEdgeLength) * context.graphEdgeSpring;
               if (isDown && i === downTarget) {
                 nodeStates[j].x -= dx;
                 nodeStates[j].y -= dy;
@@ -103,11 +92,11 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
         }
       }
       setNodeStates(nodeStates);
-    }, 1000 / PHYSICS_FPS);
+    }, 1000 / context.fps);
 
     const timeoutId = setTimeout(() => {
       clearInterval(intervalId);
-    }, PHYSICS_DURATION);
+    }, context.graphPhysicsDuration);
 
     return () => {
       clearInterval(intervalId);
@@ -138,7 +127,7 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
         const i = nodeStates.findIndex(e => {
           const dx = x - e.x;
           const dy = y - e.y;
-          return dx * dx + dy * dy <= NODE_RADIUS * NODE_RADIUS;
+          return dx * dx + dy * dy <= context.graphNodeRadius * context.graphNodeRadius;
         });
         setDownTarget(i);
       }
@@ -175,7 +164,7 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
 
   const onWheel = React.useCallback(
     (event: React.WheelEvent<SVGSVGElement>) => {
-      setZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom + event.deltaY)));
+      setZoom(Math.max(context.graphZoomMin, Math.min(context.graphZoomMax, zoom + event.deltaY)));
     },
     [zoom, setZoom]
   );
