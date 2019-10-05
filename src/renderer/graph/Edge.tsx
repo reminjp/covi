@@ -28,6 +28,14 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
           cx={x1 + cvx}
           cy={y1 + cvy}
           r={r}
+          stroke={context.backgroundColor}
+          strokeWidth={context.strokeWidth * 2}
+          fill="none"
+        />
+        <circle
+          cx={x1 + cvx}
+          cy={y1 + cvy}
+          r={r}
           stroke={hovered ? context.primaryColor : context.color}
           strokeWidth={context.strokeWidth}
           fill="none"
@@ -62,6 +70,7 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
   if (variant === undefined || variant === 0) {
     return (
       <g>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={context.backgroundColor} strokeWidth={context.strokeWidth * 2} />
         <line
           x1={x1}
           y1={y1}
@@ -125,6 +134,12 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
 
   return (
     <g>
+      <path
+        d={`M${end1X},${end1Y} Q${cx},${cy} ${end2X},${end2Y}`}
+        fill="none"
+        stroke={context.backgroundColor}
+        strokeWidth={context.strokeWidth * 2}
+      />
       <path
         d={`M${end1X},${end1Y} Q${cx},${cy} ${end2X},${end2Y}`}
         fill="none"

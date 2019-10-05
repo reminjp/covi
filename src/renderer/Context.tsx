@@ -3,12 +3,12 @@ import * as React from 'react';
 
 export const defaultValue = {
   color: '#000000',
-  primaryColor: '#3273dc',
+  primaryColor: '#ff3860',
   backgroundColor: '#ffffff',
   fontSizeSmall: 8,
   fontSizeNormal: 12,
   strokeWidth: 1,
-  arrowSize: 4,
+  arrowSize: 3,
   fps: 60,
   // Graph
   graphZoomMin: 0,
