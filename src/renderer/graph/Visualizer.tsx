@@ -69,7 +69,13 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
     }))
   );
   const [modifiedAt, setModifiedAt] = React.useState(new Date());
+  const [isPhysicsEnabled, setIsPhysicsEnabled] = React.useState(true);
+  const handleTogglePhysics = React.useCallback(() => {
+    setIsPhysicsEnabled(!isPhysicsEnabled);
+    setModifiedAt(new Date());
+  }, [isPhysicsEnabled, setIsPhysicsEnabled, setModifiedAt]);
   React.useEffect(() => {
+    if (!isPhysicsEnabled) return;
     if (new Date().getTime() > modifiedAt.getTime() + PHYSICS_DURATION) return;
 
     const intervalId = setInterval(() => {
@@ -115,7 +121,7 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
     return () => {
       clearInterval(intervalId);
     };
-  }, [isDown, downTarget, nodeStates, modifiedAt, adjacencyMatrix]);
+  }, [isPhysicsEnabled, isDown, downTarget, nodeStates, modifiedAt, adjacencyMatrix]);
 
   const onPointerMove = React.useCallback(
     (event: React.PointerEvent<SVGSVGElement>) => {
@@ -202,6 +208,7 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
     <>
       <Navbar>
         <Button onClick={handleCopySvg}>Copy SVG</Button>
+        <Button onClick={handleTogglePhysics}>{isPhysicsEnabled ? 'Disable' : 'Enable'} Physics</Button>
       </Navbar>
       <svg
         ref={svgRef}
