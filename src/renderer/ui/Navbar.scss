@@ -8,8 +8,4 @@
   padding-top: $gap / 4;
   padding-left: $gap / 4;
   user-select: none;
-
-  *:not(:first-child) {
-    margin-left: $gap / 4;
-  }
 }
