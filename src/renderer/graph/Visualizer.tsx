@@ -73,6 +73,11 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
     if (new Date().getTime() > modifiedAt.getTime() + PHYSICS_DURATION) return;
 
     const intervalId = setInterval(() => {
+      if (new Date().getTime() > modifiedAt.getTime() + PHYSICS_DURATION) {
+        clearInterval(intervalId);
+        return;
+      }
+
       for (let iteration = 0; iteration < PHYSICS_ITERATION; iteration++) {
         for (let i = 0; i < graph.nodes.length; i++) {
           if (isDown && i === downTarget) continue;
@@ -107,13 +112,8 @@ export const Visualizer: React.FC<Props & VisualizerProps> = ({ graph, width, he
       setNodeStates(nodeStates);
     }, 1000 / context.fps);
 
-    const timeoutId = setTimeout(() => {
-      clearInterval(intervalId);
-    }, PHYSICS_DURATION);
-
     return () => {
       clearInterval(intervalId);
-      clearTimeout(timeoutId);
     };
   }, [isDown, downTarget, nodeStates, modifiedAt, adjacencyMatrix]);
 
