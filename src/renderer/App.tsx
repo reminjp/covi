@@ -2,6 +2,7 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import ReactResizeDetector from 'react-resize-detector';
 import { Options } from '../main/Options';
+import { Provider } from './Context';
 import { GraphVisualizer } from './graph';
 
 interface Props {
@@ -28,7 +29,7 @@ export const App: React.FC<Props> = ({ options }) => {
 
   return (
     <>
-      {visualizer}
+      <Provider>{visualizer}</Provider>
       <ReactResizeDetector handleWidth handleHeight onResize={onResize} />
     </>
   );

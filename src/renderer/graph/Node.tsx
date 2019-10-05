@@ -1,6 +1,6 @@
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import { BACKGROUND_COLOR, COLOR, COLOR_HOVERED, NODE_FONT_SIZE, NODE_RADIUS, STROKE_WIDTH } from './constants';
+import { Context } from '../Context';
 
 interface Props {
   x: number;
@@ -10,24 +10,26 @@ interface Props {
 }
 
 export const Node: React.FC<Props> = ({ x, y, label, hovered }) => {
+  const context = React.useContext(Context);
+
   return (
     <g>
       <circle
         cx={x}
         cy={y}
-        r={NODE_RADIUS}
-        stroke={hovered ? COLOR_HOVERED : COLOR}
-        strokeWidth={STROKE_WIDTH}
-        fill={BACKGROUND_COLOR}
+        r={context.graphNodeRadius}
+        stroke={hovered ? context.primaryColor : context.color}
+        strokeWidth={context.strokeWidth}
+        fill={context.backgroundColor}
       />
       {label && (
         <text
           x={x}
           y={y}
-          stroke={BACKGROUND_COLOR}
-          strokeWidth={STROKE_WIDTH}
-          fill={hovered ? COLOR_HOVERED : COLOR}
-          fontSize={NODE_FONT_SIZE}
+          stroke={context.backgroundColor}
+          strokeWidth={context.strokeWidth}
+          fill={hovered ? context.primaryColor : context.color}
+          fontSize={context.fontSizeNormal}
           paintOrder="stroke"
           textAnchor="middle"
           dominantBaseline="central"
