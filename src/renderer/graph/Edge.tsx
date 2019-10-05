@@ -1,6 +1,7 @@
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { Context } from '../Context';
+import { EDGE_LENGTH, NODE_RADIUS } from './constants';
 
 interface Props {
   x1: number;
@@ -18,7 +19,7 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
 
   // Loop
   if (x1 === x2 && y1 === y2) {
-    const r = context.graphEdgeLength / (2 * Math.PI);
+    const r = EDGE_LENGTH / (2 * Math.PI);
     const cvx = r * Math.cos(-(Math.PI / 2) + variant);
     const cvy = r * Math.sin(-(Math.PI / 2) + variant);
 
@@ -82,8 +83,8 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
         {directed && (
           <polygon
             points={toArrowPoints(
-              x2 - context.graphNodeRadius * ux,
-              y2 - context.graphNodeRadius * uy,
+              x2 - NODE_RADIUS * ux,
+              y2 - NODE_RADIUS * uy,
               context.arrowSize * ux,
               context.arrowSize * uy
             )}
@@ -112,8 +113,8 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
   }
 
   // One of multiple edges
-  const cx = x1 + vx / 2 + -uy * (context.graphEdgeLength / 2) * variant;
-  const cy = y1 + vy / 2 + ux * (context.graphEdgeLength / 2) * variant;
+  const cx = x1 + vx / 2 + -uy * (EDGE_LENGTH / 2) * variant;
+  const cy = y1 + vy / 2 + ux * (EDGE_LENGTH / 2) * variant;
 
   const v1x = cx - x1;
   const v1y = cy - y1;
@@ -127,10 +128,10 @@ export const Edge: React.FC<Props> = ({ x1, y1, x2, y2, directed, variant, label
   const uv2x = v2x / l2;
   const uv2y = v2y / l2;
 
-  const end1X = x1 + context.graphNodeRadius * uv1x;
-  const end1Y = y1 + context.graphNodeRadius * uv1y;
-  const end2X = x2 - context.graphNodeRadius * uv2x;
-  const end2Y = y2 - context.graphNodeRadius * uv2y;
+  const end1X = x1 + NODE_RADIUS * uv1x;
+  const end1Y = y1 + NODE_RADIUS * uv1y;
+  const end2X = x2 - NODE_RADIUS * uv2x;
+  const end2Y = y2 - NODE_RADIUS * uv2y;
 
   return (
     <g>

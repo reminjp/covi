@@ -1,6 +1,7 @@
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { Context } from '../Context';
+import { NODE_RADIUS } from './constants';
 
 interface Props {
   x: number;
@@ -17,7 +18,7 @@ export const Node: React.FC<Props> = ({ x, y, label, hovered }) => {
       <circle
         cx={x}
         cy={y}
-        r={context.graphNodeRadius}
+        r={NODE_RADIUS}
         stroke={hovered ? context.primaryColor : context.color}
         strokeWidth={context.strokeWidth}
         fill={context.backgroundColor}
